@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { connect } from 'react-redux';
@@ -20,6 +21,11 @@ import {
 } from './styles';
 
 class Home extends Component {
+  static propTypes = {
+    addToCartRequest: PropTypes.func.isRequired,
+    amount: PropTypes.object.isRequired,
+  };
+
   state = {
     products: [],
   };

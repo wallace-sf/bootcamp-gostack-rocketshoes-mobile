@@ -13,6 +13,7 @@ export default function Routes() {
       screenOptions={{
         header: props => <Header {...props} />,
         cardStyle: '#191920',
+        gestureDirection: 'horizontal-inverted',
       }}
     >
       <Screen name="HomeScreen" component={Home} />

@@ -35,8 +35,11 @@ module.exports = {
       }
     ],
     'react/state-in-constructor': [2, 'never'],
+    'react/forbid-prop-types': [0, { 'forbid': ['array', 'object'] }],
     'import/prefer-default-export': 'off',
+    'react/static-property-placement': [0],
     'no-console': ['error', { allow: ['tron'] }],
+    'no-param-reassign': 'off',
     'import-helpers/order-imports': [
       'warn',
       {

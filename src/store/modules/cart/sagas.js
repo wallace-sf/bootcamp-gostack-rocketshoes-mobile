@@ -1,3 +1,4 @@
+import { ToastAndroid } from 'react-native';
 import { call, put, all, takeLatest, select } from 'redux-saga/effects';
 
 import api from '../../../services/api';
@@ -9,7 +10,21 @@ function* addToCart({ payload: id }) {
     state.cart.find(p => p.id === id)
   );
 
-  const amount = productExists ? productExists.amount + 1 : 0;
+  const stock = yield call(api.get, `/stock/${id}`);
+
+  const stockAmount = stock.data.amount;
+  const currentAmount = productExists ? productExists.amount : 0;
+
+  const amount = currentAmount + 1;
+
+  if (amount > stockAmount) {
+    ToastAndroid.show(
+      'Limite máximo de itens do produto excedido!',
+      ToastAndroid.LONG
+    );
+
+    return;
+  }
 
   if (productExists) {
     yield put(updateAmountSuccess(id, amount));
@@ -30,6 +45,18 @@ function* updateAmount({ payload }) {
   const { id, amount } = payload;
 
   if (amount <= 0) return;
+
+  const stock = yield call(api.get, `/stock/${id}`);
+  const stockAmount = stock.data.amount;
+
+  if (amount > stockAmount) {
+    ToastAndroid.show(
+      'Limite máximo de itens do produto excedido!',
+      ToastAndroid.LONG
+    );
+
+    return;
+  }
 
   yield put(updateAmountSuccess(id, amount));
 }

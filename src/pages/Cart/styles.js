@@ -1,4 +1,4 @@
-import { FlatList } from 'react-native';
+import { FlatList, SafeAreaView } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import styled from 'styled-components/native';
 
@@ -8,7 +8,7 @@ export const Container = styled.View`
   background: #191920;
 `;
 
-export const CartTable = styled.View`
+export const CartTable = styled(SafeAreaView)`
   margin-top: 15px;
   padding: 15px;
   background: #fff;
@@ -110,4 +110,15 @@ export const FinishCartText = styled.Text`
   color: #fff;
   font-weight: bold;
   text-transform: uppercase;
+`;
+
+export const EmptyCartControl = styled.View`
+  align-items: center;
+`;
+
+export const EmptyCartText = styled.Text`
+  margin-top: 30px;
+  color: #000;
+  font-size: 24px;
+  font-weight: bold;
 `;

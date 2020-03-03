@@ -43,8 +43,7 @@ export const PriceText = styled.Text`
 `;
 
 export const AddButton = styled(RectButton)`
-  margin-top: 14px;
-  flex: 1;
+  margin-top: auto;
   flex-direction: row;
   background: #7159c1;
   border-radius: 4px;
@@ -54,7 +53,6 @@ export const AddButton = styled(RectButton)`
 export const AddText = styled.Text.attrs({
   numberOfLines: 1,
 })`
-  padding: 12px;
   flex: 1;
   font-size: 14px;
   color: #fff;
