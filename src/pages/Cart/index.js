@@ -1,12 +1,9 @@
-import PropTypes from 'prop-types';
 import React from 'react';
-import { Text } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import { useSelector, useDispatch } from 'react-redux';
 
-import * as cartActions from '../../store/modules/cart/actions';
+import * as CartActions from '../../store/modules/cart/actions';
 import { formatPrice } from '../../utils/format';
 import {
   Container,
@@ -30,15 +27,32 @@ import {
   EmptyCartText,
 } from './styles';
 
-function Cart(props) {
-  const { cart, updateAmountRequest, removeFromCart, total, cartSize } = props;
+export default function Cart() {
+  const cart = useSelector(state =>
+    state.cart.map(item => ({
+      ...item,
+      subTotal: formatPrice(item.amount * item.price),
+    }))
+  );
+
+  const total = useSelector(state =>
+    formatPrice(
+      state.cart.reduce((sumTotal, item) => {
+        return sumTotal + item.amount * item.price;
+      }, 0)
+    )
+  );
+
+  const cartSize = useSelector(state => state.cart.length);
+
+  const dispatch = useDispatch();
 
   function increment(item) {
-    updateAmountRequest(item.id, item.amount + 1);
+    dispatch(CartActions.updateAmountRequest(item.id, item.amount + 1));
   }
 
   function decrement(item) {
-    updateAmountRequest(item.id, item.amount - 1);
+    dispatch(CartActions.updateAmountRequest(item.id, item.amount - 1));
   }
 
   console.tron.log(cartSize);
@@ -63,7 +77,11 @@ function Cart(props) {
                       <ItemTitle>{item.title}</ItemTitle>
                       <ItemPrice>{item.priceFormatted}</ItemPrice>
                     </ItemDetail>
-                    <RectButton onPress={() => removeFromCart(item.id)}>
+                    <RectButton
+                      onPress={() =>
+                        dispatch(CartActions.removeFromCart(item.id))
+                      }
+                    >
                       <Icon name="delete-forever" size={24} color="#7159c1" />
                     </RectButton>
                   </ItemInfo>
@@ -106,29 +124,3 @@ function Cart(props) {
     </Container>
   );
 }
-
-Cart.propTypes = {
-  cart: PropTypes.array.isRequired,
-  updateAmountRequest: PropTypes.func.isRequired,
-  removeFromCart: PropTypes.func.isRequired,
-  total: PropTypes.string.isRequired,
-  cartSize: PropTypes.number.isRequired,
-};
-
-const mapStateToProps = state => ({
-  cart: state.cart.map(item => ({
-    ...item,
-    subTotal: formatPrice(item.amount * item.price),
-  })),
-  total: formatPrice(
-    state.cart.reduce((total, item) => {
-      return total + item.amount * item.price;
-    }, 0)
-  ),
-  cartSize: state.cart.length,
-});
-
-const mapDispatchToProps = dispatch =>
-  bindActionCreators(cartActions, dispatch);
-
-export default connect(mapStateToProps, mapDispatchToProps)(Cart);

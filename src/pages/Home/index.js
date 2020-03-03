@@ -1,11 +1,9 @@
-import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import api from '../../services/api';
-import * as cartActions from '../../store/modules/cart/actions';
+import * as CartActions from '../../store/modules/cart/actions';
 import { formatPrice } from '../../utils/format';
 import {
   Container,
@@ -20,66 +18,57 @@ import {
   IconText,
 } from './styles';
 
-class Home extends Component {
-  static propTypes = {
-    addToCartRequest: PropTypes.func.isRequired,
-    amount: PropTypes.object.isRequired,
-  };
+export default function Home() {
+  const [products, setProducts] = useState([]);
 
-  state = {
-    products: [],
-  };
+  const amount = useSelector(state =>
+    state.cart.reduce((sumAmount, product) => {
+      sumAmount[product.id] = product.amount;
 
-  async componentDidMount() {
-    const response = await api.get('/products');
+      return sumAmount;
+    }, {})
+  );
 
-    const data = response.data.map(product => ({
-      ...product,
-      priceFormmated: formatPrice(product.price),
-    }));
+  const dispatch = useDispatch();
 
-    this.setState({ products: data });
-  }
+  useEffect(() => {
+    async function loadProducts() {
+      const response = await api.get('/products');
 
-  render() {
-    const { addToCartRequest, amount } = this.props;
-    const { products } = this.state;
+      const data = response.data.map(product => ({
+        ...product,
+        priceFormmated: formatPrice(product.price),
+      }));
 
-    return (
-      <Container>
-        <ProductList
-          data={products}
-          keyExtractor={product => String(product.id)}
-          renderItem={({ item }) => (
-            <Product>
-              <ProductImage source={{ uri: item.image }} />
-              <TitleText>{item.title}</TitleText>
-              <PriceText>{item.priceFormmated}</PriceText>
-              <AddButton onPress={() => addToCartRequest(item.id)}>
-                <IconView>
-                  <Icon name="add-shopping-cart" color="#fff" size={18} />
-                  <IconText>{amount[item.id] || 0}</IconText>
-                </IconView>
-                <AddText>Adicionar</AddText>
-              </AddButton>
-            </Product>
-          )}
-          horizontal
-        />
-      </Container>
-    );
-  }
+      setProducts(data);
+    }
+
+    loadProducts();
+  }, []);
+
+  return (
+    <Container>
+      <ProductList
+        data={products}
+        keyExtractor={product => String(product.id)}
+        renderItem={({ item }) => (
+          <Product>
+            <ProductImage source={{ uri: item.image }} />
+            <TitleText>{item.title}</TitleText>
+            <PriceText>{item.priceFormmated}</PriceText>
+            <AddButton
+              onPress={() => dispatch(CartActions.addToCartRequest(item.id))}
+            >
+              <IconView>
+                <Icon name="add-shopping-cart" color="#fff" size={18} />
+                <IconText>{amount[item.id] || 0}</IconText>
+              </IconView>
+              <AddText>Adicionar</AddText>
+            </AddButton>
+          </Product>
+        )}
+        horizontal
+      />
+    </Container>
+  );
 }
-
-const mapStateToProps = state => ({
-  amount: state.cart.reduce((amount, product) => {
-    amount[product.id] = product.amount;
-
-    return amount;
-  }, {}),
-});
-
-const mapDispatchToProps = dispatch =>
-  bindActionCreators(cartActions, dispatch);
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home);

@@ -24,6 +24,7 @@ module.exports = {
   plugins: [
     'react',
     'prettier',
+    'react-hooks',
     'eslint-plugin-import-helpers'
   ],
   rules: {
@@ -36,6 +37,8 @@ module.exports = {
     ],
     'react/state-in-constructor': [2, 'never'],
     'react/forbid-prop-types': [0, { 'forbid': ['array', 'object'] }],
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
     'import/prefer-default-export': 'off',
     'react/static-property-placement': [0],
     'no-console': ['error', { allow: ['tron'] }],
